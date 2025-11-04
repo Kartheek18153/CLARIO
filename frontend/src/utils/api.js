@@ -41,6 +41,52 @@ export const getUsers = async () => {
   }
 };
 
+export const updateProfile = async (profileData) => {
+  try {
+    const token = localStorage.getItem("token");
+    const { data } = await axios.put(`${API_URL}/user/update`, profileData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+    return data;
+  } catch (error) {
+    console.error("Update profile error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const uploadProfilePic = async (formData) => {
+  try {
+    const token = localStorage.getItem("token");
+    const { data } = await axios.post(`${API_URL}/user/upload`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+    return data;
+  } catch (error) {
+    console.error("Upload profile pic error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteAccount = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const { data } = await axios.delete(`${API_URL}/user/delete`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    return data;
+  } catch (error) {
+    console.error("Delete account error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 // -------- CHAT ----------
 export const fetchMessages = async (userId) => {
   try {

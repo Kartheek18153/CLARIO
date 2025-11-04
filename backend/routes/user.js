@@ -4,6 +4,7 @@ import {
   getMe,
   updateProfile,
   uploadProfilePic,
+  deleteAccount,
 } from "../controllers/userController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
@@ -20,5 +21,8 @@ router.put("/update", verifyToken, updateProfile);
 
 // ✅ Upload profile picture
 router.post("/upload", verifyToken, uploadProfilePic);
+
+// ✅ Delete account
+router.delete("/delete", verifyToken, deleteAccount);
 
 export default router;

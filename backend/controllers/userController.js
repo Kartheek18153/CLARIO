@@ -46,17 +46,22 @@ export const getMe = async (req, res) => {
 
 // ✅ Update profile info
 export const updateProfile = async (req, res) => {
-  const { username, status } = req.body;
+  const { username, email, status } = req.body;
 
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("users")
-      .update({ username, status })
-      .eq("id", req.user.id);
+      .update({ username, email, status })
+      .eq("id", req.user.id)
+      .select("id, username, email, status, profile_pic")
+      .single();
 
     if (error) return res.status(400).json({ error: error.message });
 
-    res.json({ message: "Profile updated successfully" });
+    res.json({
+      message: "Profile updated successfully",
+      user: data
+    });
   } catch (err) {
     console.error("Error updating profile:", err);
     res.status(500).json({ error: err.message });
@@ -69,19 +74,39 @@ export const uploadProfilePic = async (req, res) => {
     const file = req.file.path;
     const result = await cloudinary.uploader.upload(file);
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .update({ profile_pic: result.secure_url })
-      .eq("id", req.user.id);
+      .eq("id", req.user.id)
+      .select("id, username, email, status, profile_pic")
+      .single();
 
     if (error) return res.status(400).json({ error: error.message });
 
     res.json({
       message: "Profile picture updated successfully",
       url: result.secure_url,
+      user: data
     });
   } catch (err) {
     console.error("Error uploading profile picture:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ✅ Delete account
+export const deleteAccount = async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from("users")
+      .delete()
+      .eq("id", req.user.id);
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ message: "Account deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting account:", err);
     res.status(500).json({ error: err.message });
   }
 };

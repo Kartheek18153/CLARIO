@@ -1,10 +1,12 @@
 // src/pages/Settings.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { updateProfile, uploadProfilePic, deleteAccount } from "../utils/api";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,6 +28,7 @@ const Settings = () => {
     return localStorage.getItem("theme") || "light";
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -104,6 +107,25 @@ const Settings = () => {
       ...prev,
       [setting]: value
     }));
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      setIsDeleting(true);
+      try {
+        const token = localStorage.getItem("token");
+        await deleteAccount(token);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        alert("Account deleted successfully.");
+        navigate("/login");
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        alert("Failed to delete account. Please try again.");
+      } finally {
+        setIsDeleting(false);
+      }
+    }
   };
 
   const containerVariants = {
@@ -578,11 +600,13 @@ const Settings = () => {
                     🚪 Logout from all devices
                   </motion.button>
                   <motion.button
-                    className="w-full text-left px-6 py-4 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded-xl transition-all duration-300 backdrop-blur-sm border border-red-500/30"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    className="w-full text-left px-6 py-4 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded-xl transition-all duration-300 backdrop-blur-sm border border-red-500/30 disabled:opacity-50"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    🗑️ Delete Account
+                    {isDeleting ? "Deleting..." : "🗑️ Delete Account"}
                   </motion.button>
                 </div>
               </div>
