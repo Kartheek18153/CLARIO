@@ -41,7 +41,7 @@ const Stories = () => {
       const token = localStorage.getItem("token");
       const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
       const formData = new FormData();
-      formData.append("story", uploadFile);
+      formData.append("media", uploadFile);
       if (uploadCaption.trim()) {
         formData.append("caption", uploadCaption);
       }
