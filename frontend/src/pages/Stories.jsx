@@ -22,7 +22,7 @@ const Stories = () => {
     try {
       const token = localStorage.getItem("token");
       const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
-      const response = await axios.get(`${API_URL}/stories`, {
+      const response = await axios.get(`${API_URL}/story/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStories(response.data);
@@ -46,7 +46,7 @@ const Stories = () => {
         formData.append("caption", uploadCaption);
       }
 
-      await axios.post(`${API_URL}/stories`, formData, {
+      await axios.post(`${API_URL}/story/create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -237,7 +237,7 @@ const Stories = () => {
                     <div className="aspect-square relative group">
                       {story.media_type === "image" ? (
                         <motion.img
-                          src={`http://localhost:5000${story.media_url}`}
+                          src={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${story.media_url}`}
                           alt={story.caption || "Story"}
                           className="w-full h-full object-cover"
                           whileHover={{ scale: 1.1 }}
@@ -245,7 +245,7 @@ const Stories = () => {
                         />
                       ) : (
                         <motion.video
-                          src={`http://localhost:5000${story.media_url}`}
+                          src={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${story.media_url}`}
                           className="w-full h-full object-cover"
                           muted
                           whileHover={{ scale: 1.1 }}
