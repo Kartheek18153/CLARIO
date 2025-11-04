@@ -15,6 +15,28 @@ const StatusStories = ({ stories: propStories, onClose, currentIndex = 0 }) => {
   const [storyToDelete, setStoryToDelete] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Fetch current user info
+  const fetchCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const myStoriesRes = await axios.get("http://localhost:5000/api/story/my", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Extract current user info from my stories response
+      if (myStoriesRes.data.stories && myStoriesRes.data.stories.length > 0) {
+        // Get user info from the first story (assuming all stories belong to current user)
+        const userInfo = myStoriesRes.data.stories[0].users;
+        setCurrentUser(userInfo);
+      } else {
+        // If no stories, set currentUser to null
+        setCurrentUser(null);
+      }
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    }
+  };
+
   // Fetch all stories and user's stories
   const fetchStories = async () => {
     try {
@@ -51,6 +73,8 @@ const StatusStories = ({ stories: propStories, onClose, currentIndex = 0 }) => {
       setSelectedStory(propStories[currentIndex]);
       setCurrentStoryIndex(0);
       setIsModalOpen(true);
+      // Fetch current user for delete functionality
+      fetchCurrentUser();
     } else {
       // Fetch own data for full component
       fetchStories();
