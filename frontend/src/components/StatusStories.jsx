@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { deleteStory } from "../utils/api";
 
-const StatusStories = () => {
+const StatusStories = ({ stories: propStories, onClose, currentIndex = 0 }) => {
   const [stories, setStories] = useState([]);
   const [myStories, setMyStories] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
@@ -46,8 +46,16 @@ const StatusStories = () => {
   };
 
   useEffect(() => {
-    fetchStories();
-  }, []);
+    if (propStories && propStories.length > 0) {
+      // Use props for modal viewing
+      setSelectedStory(propStories[currentIndex]);
+      setCurrentStoryIndex(0);
+      setIsModalOpen(true);
+    } else {
+      // Fetch own data for full component
+      fetchStories();
+    }
+  }, [propStories, currentIndex]);
 
   // Handle file upload
   const handleFileUpload = async (event) => {
@@ -119,7 +127,11 @@ const StatusStories = () => {
     if (currentStoryIndex < selectedStory.stories.length - 1) {
       setCurrentStoryIndex(currentStoryIndex + 1);
     } else {
-      setIsModalOpen(false);
+      if (onClose) {
+        onClose();
+      } else {
+        setIsModalOpen(false);
+      }
     }
   };
 
@@ -308,7 +320,13 @@ const StatusStories = () => {
 
             {/* Close Button */}
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                if (onClose) {
+                  onClose();
+                } else {
+                  setIsModalOpen(false);
+                }
+              }}
               className="absolute top-4 right-4 text-white text-2xl"
             >
               ×
