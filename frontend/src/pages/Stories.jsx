@@ -13,6 +13,8 @@ const Stories = () => {
   const [uploadCaption, setUploadCaption] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [storyToDelete, setStoryToDelete] = useState(null);
 
   useEffect(() => {
     fetchStories();
@@ -68,6 +70,25 @@ const Stories = () => {
     const file = event.target.files[0];
     if (file && (file.type.startsWith("image/") || file.type.startsWith("video/"))) {
       setUploadFile(file);
+    }
+  };
+
+  const handleDeleteStory = async () => {
+    if (!storyToDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
+
+      await axios.delete(`${API_URL}/story/${storyToDelete.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setShowDeleteModal(false);
+      setStoryToDelete(null);
+      fetchStories();
+    } catch (error) {
+      console.error("Error deleting story:", error);
     }
   };
 
@@ -290,12 +311,19 @@ const Stories = () => {
                           <span className="text-white/60 text-xs">Active now</span>
                         </motion.div>
                       </div>
-                      <motion.div
-                        className="absolute top-3 right-3 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        <span className="text-white text-sm">👁</span>
-                      </motion.div>
+                      {story.user?.is_me && (
+                        <motion.div
+                          className="absolute top-3 right-3 w-8 h-8 bg-red-500/80 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                          whileHover={{ scale: 1.1 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStoryToDelete(story);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          <span className="text-white text-sm">🗑️</span>
+                        </motion.div>
+                      )}
                     </div>
                   </motion.div>
                 ))
@@ -400,6 +428,66 @@ const Stories = () => {
                     </motion.button>
                   </motion.div>
                 </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Delete Confirmation Modal */}
+        <AnimatePresence>
+          {showDeleteModal && (
+            <motion.div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl rounded-3xl p-8 w-full max-w-md mx-4 border border-white/20 shadow-2xl"
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <motion.h2
+                  className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  🗑️ Delete Story
+                </motion.h2>
+                <motion.p
+                  className="text-white/80 text-center mb-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Are you sure you want to delete this story? This action cannot be undone.
+                </motion.p>
+                <motion.div
+                  className="flex space-x-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <motion.button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 border border-white/20"
+                    whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.2)" }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    onClick={handleDeleteStory}
+                    className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 shadow-lg"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Delete Story
+                  </motion.button>
+                </motion.div>
               </motion.div>
             </motion.div>
           )}
