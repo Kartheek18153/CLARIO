@@ -90,31 +90,25 @@ export const getAllStories = async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    // Group stories by user
-    const storiesByUser = data.reduce((acc, story) => {
-      const userId = story.users.id;
-      if (!acc[userId]) {
-        acc[userId] = {
-          user: {
-            id: story.users.id,
-            username: story.users.username,
-            profile_pic: story.users.profile_pic,
-          },
-          stories: [],
-        };
-      }
-      acc[userId].stories.push({
-        id: story.id,
-        media_url: story.media_url,
-        created_at: story.created_at,
-        expires_at: story.expires_at,
-      });
-      return acc;
-    }, {});
+    // Transform to flat array with user info embedded in each story
+    const stories = data.map(story => ({
+      id: story.id,
+      media_url: story.media_url,
+      created_at: story.created_at,
+      expires_at: story.expires_at,
+      user: {
+        id: story.users.id,
+        username: story.users.username,
+        profile_pic: story.users.profile_pic,
+        is_me: story.users.id === req.user.id, // Add is_me flag
+        is_friend: true, // For now, assume all are friends (you can implement friend logic later)
+      },
+      media_type: story.media_url.includes('.mp4') || story.media_url.includes('.webm') ? 'video' : 'image'
+    }));
 
     res.status(200).json({
       message: "All stories fetched successfully",
-      stories: Object.values(storiesByUser),
+      stories: stories,
     });
   } catch (err) {
     console.error("Error fetching all stories:", err);
