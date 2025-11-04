@@ -7,6 +7,7 @@ import {
   deleteAccount,
 } from "../controllers/userController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get("/me", verifyToken, getMe);
 router.put("/update", verifyToken, updateProfile);
 
 // ✅ Upload profile picture
-router.post("/upload", verifyToken, uploadProfilePic);
+router.post("/upload", verifyToken, upload.single("profile_pic"), uploadProfilePic);
 
 // ✅ Delete account
 router.delete("/delete", verifyToken, deleteAccount);
