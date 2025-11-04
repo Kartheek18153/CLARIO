@@ -493,7 +493,7 @@ const Stories = () => {
         <AnimatePresence>
           {selectedStory && (
             <StatusStories
-              stories={[selectedStory]}
+              stories={[{ user: selectedStory.user, stories: [selectedStory] }]}
               onClose={() => setSelectedStory(null)}
               currentIndex={0}
             />
