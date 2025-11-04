@@ -74,6 +74,7 @@ const Settings = () => {
       };
       const response = await updateProfile(profileData);
       setUser(response.user);
+      localStorage.setItem("user", JSON.stringify(response.user));
 
       // Then, if there's a profile picture, upload it separately
       if (formData.profile_pic && typeof formData.profile_pic !== 'string') {
@@ -81,6 +82,7 @@ const Settings = () => {
         picFormData.append("profile_pic", formData.profile_pic);
         const picResponse = await uploadProfilePic(picFormData);
         setUser(picResponse.user);
+        localStorage.setItem("user", JSON.stringify(picResponse.user));
       }
 
       setIsEditing(false);
