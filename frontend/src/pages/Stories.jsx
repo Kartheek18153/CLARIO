@@ -237,7 +237,7 @@ const Stories = () => {
                     <div className="aspect-square relative group">
                       {story.media_type === "image" ? (
                         <motion.img
-                          src={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${story.media_url}`}
+                          src={story.media_url}
                           alt={story.caption || "Story"}
                           className="w-full h-full object-cover"
                           whileHover={{ scale: 1.1 }}
@@ -245,7 +245,7 @@ const Stories = () => {
                         />
                       ) : (
                         <motion.video
-                          src={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${story.media_url}`}
+                          src={story.media_url}
                           className="w-full h-full object-cover"
                           muted
                           whileHover={{ scale: 1.1 }}
