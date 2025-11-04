@@ -19,21 +19,15 @@ const StatusStories = ({ stories: propStories, onClose, currentIndex = 0 }) => {
   const fetchCurrentUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const myStoriesRes = await axios.get("http://localhost:5000/api/story/my", {
+      const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
+      const userRes = await axios.get(`${API_URL}/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Extract current user info from my stories response
-      if (myStoriesRes.data.stories && myStoriesRes.data.stories.length > 0) {
-        // Get user info from the first story (assuming all stories belong to current user)
-        const userInfo = myStoriesRes.data.stories[0].users;
-        setCurrentUser(userInfo);
-      } else {
-        // If no stories, set currentUser to null
-        setCurrentUser(null);
-      }
+      setCurrentUser(userRes.data.user);
     } catch (error) {
       console.error("Error fetching current user:", error);
+      setCurrentUser(null);
     }
   };
 
