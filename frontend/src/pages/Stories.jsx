@@ -21,7 +21,8 @@ const Stories = () => {
   const fetchStories = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/stories", {
+      const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
+      const response = await axios.get(`${API_URL}/stories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStories(response.data);
@@ -38,13 +39,14 @@ const Stories = () => {
     setIsUploading(true);
     try {
       const token = localStorage.getItem("token");
+      const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
       const formData = new FormData();
       formData.append("story", uploadFile);
       if (uploadCaption.trim()) {
         formData.append("caption", uploadCaption);
       }
 
-      await axios.post("http://localhost:5000/api/stories", formData, {
+      await axios.post(`${API_URL}/stories`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
