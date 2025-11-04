@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { deleteStory } from "../utils/api";
 
 const StatusStories = () => {
   const [stories, setStories] = useState([]);
@@ -87,12 +88,7 @@ const StatusStories = () => {
     if (!storyToDelete) return;
 
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/story/${storyToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await deleteStory(storyToDelete);
 
       fetchStories(); // Refresh stories
       setIsModalOpen(false); // Close the story viewer

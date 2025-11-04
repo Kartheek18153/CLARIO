@@ -35,7 +35,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ CORS setup (allow frontend to communicate)
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || ["http://localhost:5173", "https://clario-12.onrender.com"], // allow deployed frontend
+    origin: ["http://localhost:5173", "https://clario-12.onrender.com"], // allow deployed frontend
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
@@ -57,7 +57,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || ["http://localhost:5173", "https://clario-12.onrender.com"],
+    origin: ["http://localhost:5173", "https://clario-12.onrender.com"],
     credentials: true,
   },
 });
