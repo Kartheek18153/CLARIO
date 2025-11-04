@@ -1,0 +1,10 @@
+{
+  "name": "clario-monorepo",
+  "version": "1.0.0",
+  "description": "CLARIO - Real-time chat app with AI",
+  "scripts": {
+    "build:frontend": "cd frontend && npm install && npm run build"
+  },
+  "author": "Kartheek",
+  "license": "MIT"
+}
