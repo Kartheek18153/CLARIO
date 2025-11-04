@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import cloudinary from "../config/cloudinary.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,7 +39,20 @@ export const sendMessage = async (req, res) => {
 
   // Check if an image was uploaded
   if (req.file) {
-    image_url = `http://localhost:5000/uploads/${req.file.filename}`;
+    try {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'chat_images',
+        resource_type: 'auto'
+      });
+      image_url = result.secure_url;
+
+      // Delete the local file after uploading to Cloudinary
+      fs.unlinkSync(req.file.path);
+    } catch (uploadError) {
+      console.error("Cloudinary upload error:", uploadError);
+      return res.status(500).json({ message: "Failed to upload image" });
+    }
   }
 
   try {
@@ -91,11 +105,15 @@ export const deleteMessage = async (req, res) => {
 
     if (fetchError) throw fetchError;
 
-    // If there's an image, delete it from the filesystem
+    // If there's an image, delete it from Cloudinary
     if (message.image_url) {
-      const imagePath = path.join(__dirname, "../uploads", path.basename(message.image_url));
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      try {
+        // Extract public_id from Cloudinary URL
+        const publicId = message.image_url.split('/').slice(-2).join('/').split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
+      } catch (cloudinaryError) {
+        console.error("Cloudinary delete error:", cloudinaryError);
+        // Continue with message deletion even if image deletion fails
       }
     }
 
