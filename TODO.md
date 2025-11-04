@@ -1,22 +1,15 @@
-# TODO: Implement Profile Functionality in Settings
+# Story Delete Feature Fix
 
-## 1. Backend Changes
-- [x] Modify `updateProfile` in `userController.js` to handle email updates
-- [x] Add `deleteAccount` function in `userController.js`
-- [x] Add delete account route in `user.js`
+## Backend Status
+- [x] deleteStory function exists in storyController.js
+- [x] DELETE /:id route exists in story.js
 
-## 2. Frontend API Utils
-- [x] Add `updateProfile` function in `api.js`
-- [x] Add `uploadProfilePic` function in `api.js`
-- [x] Add `deleteAccount` function in `api.js`
+## Frontend Fixes Needed
+- [ ] Add deleteStory function to frontend/src/utils/api.js
+- [ ] Update Stories.jsx to use API function instead of direct axios
+- [ ] Test story deletion functionality
 
-## 3. Settings Page Updates
-- [x] Update `Settings.jsx` to use API functions instead of direct axios calls
-- [x] Handle profile picture upload separately from profile update
-- [x] Implement delete account button functionality
-- [x] Fix hardcoded URL to use environment variables
-
-## 4. Testing
-- [ ] Test profile update (username, email)
-- [ ] Test profile picture upload
-- [ ] Test account deletion
+## Testing
+- [ ] Verify story deletion works from Stories page
+- [ ] Check error handling for unauthorized deletions
+- [ ] Confirm UI updates after deletion

@@ -130,6 +130,20 @@ export const sendMessage = async (messageData) => {
   }
 };
 
+// -------- STORIES ----------
+export const deleteStory = async (storyId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const { data } = await axios.delete(`${API_URL}/story/${storyId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  } catch (error) {
+    console.error("Delete story error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 // -------- AI ----------
 export const sendToAI = async (message) => {
   try {

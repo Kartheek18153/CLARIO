@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import StatusStories from "../components/StatusStories";
+import { deleteStory } from "../utils/api";
 
 const Stories = () => {
   const [stories, setStories] = useState([]);
@@ -77,12 +78,7 @@ const Stories = () => {
     if (!storyToDelete) return;
 
     try {
-      const token = localStorage.getItem("token");
-      const API_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "http://localhost:5000/api";
-
-      await axios.delete(`${API_URL}/story/${storyToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await deleteStory(storyToDelete.id);
 
       setShowDeleteModal(false);
       setStoryToDelete(null);
