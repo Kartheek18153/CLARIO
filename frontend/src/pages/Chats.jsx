@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getUsers, fetchMessages, sendMessage, deleteMessage } from "../utils/api";
+import { socket } from "../utils/socket";
 import ChatWindow from "../components/ChatWindow";
 import BackButton from "../components/BackButton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -59,6 +60,23 @@ const Chats = () => {
     fetchUserMessages();
   }, [selectedUser]);
 
+  // Listen for real-time messages
+  useEffect(() => {
+    const handleReceiveMessage = (data) => {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const roomId = [currentUser.id, selectedUser.id].sort().join('-');
+      if (data.roomId === roomId) {
+        setMessages((prev) => [...prev, data]);
+      }
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
+  }, [selectedUser]);
+
   const handleSelectUser = (user) => {
     setSelectedUser(user);
   };
@@ -68,6 +86,9 @@ const Chats = () => {
     const currentUser = JSON.parse(localStorage.getItem("user"));
     // Create a unique room ID based on the two users' IDs
     const roomId = [currentUser.id, selectedUser.id].sort().join('-');
+
+    // Join the room
+    socket.emit("join_room", roomId);
 
     const formData = new FormData();
     formData.append("room_id", roomId);
