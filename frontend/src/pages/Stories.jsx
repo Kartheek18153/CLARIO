@@ -25,7 +25,7 @@ const Stories = () => {
       const response = await axios.get(`${API_URL}/story/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setStories(response.data);
+      setStories(response.data.stories);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching stories:", error);
