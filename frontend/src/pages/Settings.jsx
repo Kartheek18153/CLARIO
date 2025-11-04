@@ -67,24 +67,22 @@ const Settings = () => {
   const handleSaveProfile = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const formDataToSend = new FormData();
-      formDataToSend.append("username", formData.username);
-      if (formData.email) formDataToSend.append("email", formData.email);
+      // First, update profile info (username, email)
+      const profileData = {
+        username: formData.username,
+        email: formData.email || "",
+      };
+      const response = await updateProfile(profileData);
+      setUser(response.user);
+
+      // Then, if there's a profile picture, upload it separately
       if (formData.profile_pic && typeof formData.profile_pic !== 'string') {
-        formDataToSend.append("profile_pic", formData.profile_pic);
+        const picFormData = new FormData();
+        picFormData.append("profile_pic", formData.profile_pic);
+        const picResponse = await uploadProfilePic(picFormData);
+        setUser(picResponse.user);
       }
 
-      const response = await axios.put("http://localhost:5000/api/user/profile", formDataToSend, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Update local storage
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      setUser(response.data.user);
       setIsEditing(false);
       alert("Profile updated successfully!");
     } catch (error) {
@@ -113,10 +111,7 @@ const Settings = () => {
     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       setIsDeleting(true);
       try {
-        const token = localStorage.getItem("token");
-        await deleteAccount(token);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        await deleteAccount();
         alert("Account deleted successfully.");
         navigate("/login");
       } catch (error) {
